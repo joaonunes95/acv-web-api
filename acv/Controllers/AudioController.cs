@@ -1,8 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Database.Repositories;
+using Microsoft.AspNetCore.Mvc;
 using Presentation.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Presentation.Controllers
@@ -11,10 +10,20 @@ namespace Presentation.Controllers
     [Route("[controller]")]
     public class AudioController : ControllerBase
     {
-        [HttpGet]
-        public IActionResult Get()
+        private readonly IAudioRepository _audioRepository;
+
+        public AudioController(IAudioRepository audioRepository)
         {
-            return Ok("hello from get all audio");
+            _audioRepository = audioRepository;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Get()
+        {
+            var audio = await _audioRepository.GetAllAudioAsync();
+
+
+            return Ok(audio);
         }
 
         [HttpGet("{id}")]
