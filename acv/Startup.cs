@@ -1,19 +1,14 @@
-using Database;
 using Database.Context;
 using Database.Repositories;
+using Domain.Entities;
+using Domain.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace acv
 {
@@ -32,17 +27,21 @@ namespace acv
             services.AddDbContext<AcvContext>(
                 options => options.UseSqlServer(Configuration.GetConnectionString("AcvDB")));
 
+            services.AddIdentity<AppUser, IdentityRole>()
+                .AddEntityFrameworkStores<AcvContext>()
+                .AddDefaultTokenProviders();
+
             services.AddControllers();
             services.AddTransient<IAudioRepository, AudioRepository>();
+            services.AddTransient<IAccountRepository, AccountRepository>();
 
-            //services.AddCors(options => options.AddPolicy("CorsPolicy", builder =>
-            //{
-            //    builder.AllowAnyHeader()
-            //           .AllowAnyMethod()
-            //           .SetIsOriginAllowed((host) => true)
-            //           .AllowCredentials();
-            //}));
-
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(builder =>
+                {
+                    builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+                });
+            });
 
             services.AddAuthentication("CookieSeriesAuth")
                 //.addJWT; // mudar nome depois

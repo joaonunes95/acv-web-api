@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Database.Repositories
+namespace Domain.Interfaces
 {
     public interface IAudioRepository
     {

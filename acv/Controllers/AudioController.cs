@@ -1,4 +1,4 @@
-﻿using Database.Repositories;
+﻿using Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Models;
 using System;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Presentation.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class AudioController : ControllerBase
     {
         private readonly IAudioRepository _audioRepository;

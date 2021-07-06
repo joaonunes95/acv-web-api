@@ -5,7 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.4" />
+    <Folder Include="AutoMapper\" />
+    <Folder Include="Services\" />
+    <Folder Include="UseCases\" />
   </ItemGroup>
 
 </Project>
