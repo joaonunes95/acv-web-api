@@ -2,6 +2,7 @@ using Database.Context;
 using Database.Repositories;
 using Domain.Entities;
 using Domain.Interfaces;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -32,6 +33,9 @@ namespace acv
                 .AddDefaultTokenProviders();
 
             services.AddControllers();
+
+            services.AddMediatR(Application.AssemblyReference.Value);
+
             services.AddTransient<IAudioRepository, AudioRepository>();
             services.AddTransient<IAccountRepository, AccountRepository>();
 

@@ -1,22 +1,30 @@
-﻿using Domain.Interfaces;
-using Microsoft.AspNetCore.Http;
+﻿using Application.UseCases.AccountUseCase.Commands.Requests;
+using Application.UseCases.AccountUseCase.Commands.Responses;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace Presentation.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class AccountController : ControllerBase
     {
-        private readonly IAccountRepository _accountRepository;
-
-        public AccountController(IAccountRepository accountRepository)
+        public AccountController()
         {
-            _accountRepository = accountRepository;
+        }
+
+        [HttpPost("signup")]
+        public Task<SignUpResponse> SignUp(
+            [FromServices] IMediator mediator,
+            [FromBody] SignUpRequest command)
+        {
+            var result = mediator.Send(command);
+
+            // if result is not valid then return error message
+            // validar os dados na handler, segundo o balta.io
+
+            return result;
         }
     }
 }

@@ -7,7 +7,19 @@
   <ItemGroup>
     <Folder Include="AutoMapper\" />
     <Folder Include="Services\" />
-    <Folder Include="UseCases\" />
+    <Folder Include="UseCases\ModeloUseCase\Commands\Requests\" />
+    <Folder Include="UseCases\ModeloUseCase\Commands\Responses\" />
+    <Folder Include="UseCases\AudioUseCase\Commands\Responses\" />
+    <Folder Include="UseCases\AudioUseCase\Commands\Requests\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="9.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Database\Database.csproj" />
+    <ProjectReference Include="..\Domain\Domain.csproj" />
   </ItemGroup>
 
 </Project>
