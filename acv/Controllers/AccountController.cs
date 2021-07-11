@@ -34,9 +34,9 @@ namespace Presentation.Controllers
 
         [Authorize]
         [HttpGet("{id:guid}")]
-        public async Task<IActionResult> GetById(string id)
+        public async Task<IActionResult> GetById(Guid id)
         {
-            var user = await _accountRespository.GetOne(Guid.Parse(id));
+            var user = await _accountRespository.GetOne(id);
 
             var claims = await _accountRespository.GetClaimsAsync(user);
 
@@ -81,6 +81,13 @@ namespace Presentation.Controllers
                 return Unauthorized();
             
             return Ok(result);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+
+            return Ok(id);
         }
     }
 }

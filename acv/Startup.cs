@@ -31,7 +31,14 @@ namespace acv
             services.AddDbContext<AcvContext>(
                 options => options.UseSqlServer(Configuration.GetConnectionString("AcvDB")));
 
-            services.AddIdentity<AppUser, IdentityRole>()
+            services.AddIdentity<AppUser, IdentityRole>(option =>
+            {
+                option.Password.RequireDigit = false;
+                option.Password.RequiredLength = 3;
+                option.Password.RequireLowercase = false;
+                option.Password.RequireNonAlphanumeric = false;
+                option.Password.RequireUppercase = false;
+            })
                 .AddEntityFrameworkStores<AcvContext>()
                 .AddDefaultTokenProviders();
 
