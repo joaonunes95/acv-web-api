@@ -12,12 +12,10 @@ namespace Application.UseCases.AccountUseCase.Commands.Requests
         [Required]
         public string LastName { get; set; }
 
-        [Required]
-        [EmailAddress]
+        [Required, EmailAddress]
         public string Email { get; set; }
         
-        [Required]
-        [Compare("ConfirmPassword")]
+        [Required, Compare("ConfirmPassword")]
         public string Password { get; set; }
         
         [Required]

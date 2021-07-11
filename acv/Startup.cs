@@ -3,6 +3,7 @@ using Database.Repositories;
 using Domain.Entities;
 using Domain.Interfaces;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -10,6 +11,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace acv
 {
@@ -32,10 +35,29 @@ namespace acv
                 .AddEntityFrameworkStores<AcvContext>()
                 .AddDefaultTokenProviders();
 
-            services.AddControllers();
-
             services.AddMediatR(Application.AssemblyReference.Value);
 
+            services.AddAuthentication(option =>
+            {
+                option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                option.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                option.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+                .AddJwtBearer(option =>
+                {
+                    option.SaveToken = true;
+                    option.RequireHttpsMetadata = false;
+                    option.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        ValidAudience = Configuration["JWT:ValidAudience"],
+                        ValidIssuer = Configuration["JWT:ValidIssuer"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JWT:Secret"]))
+                    };
+                });
+
+            services.AddControllers();
             services.AddTransient<IAudioRepository, AudioRepository>();
             services.AddTransient<IAccountRepository, AccountRepository>();
 
@@ -45,19 +67,6 @@ namespace acv
                 {
                     builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
                 });
-            });
-
-            services.AddAuthentication("CookieSeriesAuth")
-                //.addJWT; // mudar nome depois
-                .AddCookie("CookieSeriesAuth", opt =>
-                {
-                    opt.Cookie.Name = "SeriesAuthCookie";
-                });
-
-            services.AddAuthorization(opt => {
-                opt.AddPolicy("Admin", p => p.RequireRole("SecretRole"));
-
-                opt.AddPolicy("AdvancedUser", p => p.RequireRole("Student"));
             });
         }
 
@@ -72,7 +81,6 @@ namespace acv
             app.UseHttpsRedirection();
 
             app.UseRouting();
-
 
             app.UseAuthentication();
             app.UseAuthorization();

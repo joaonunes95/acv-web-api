@@ -1,10 +1,14 @@
 ﻿using Domain.Entities;
 using Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Database.Repositories
@@ -12,10 +16,17 @@ namespace Database.Repositories
     public class AccountRepository : IAccountRepository
     {
         private readonly UserManager<AppUser> _userManager;
+        private readonly SignInManager<AppUser> _signInManager;
+        private readonly IConfiguration _configuration;
 
-        public AccountRepository(UserManager<AppUser> userManager)
+        public AccountRepository(
+            UserManager<AppUser> userManager, 
+            SignInManager<AppUser> signInManager,
+            IConfiguration configuration)
         {
             _userManager = userManager;
+            _signInManager = signInManager;
+            _configuration = configuration;
         }
 
         public async Task<IdentityResult> SignUpAsync(AppUser user, string password)
@@ -30,14 +41,47 @@ namespace Database.Repositories
             return _userManager.Users.ToList();
         }
 
-        public async Task<AppUser> GetOne(string id)
+        public async Task<AppUser> GetOne(Guid id)
         {
-            return await _userManager.FindByIdAsync(id);
+            return await _userManager.FindByIdAsync(id.ToString());
+        }
+
+        public async Task<AppUser> GetOne(string username)
+        {
+            return await _userManager.FindByNameAsync(username);
         }
 
         public async Task<IList<Claim>> GetClaimsAsync(AppUser user)
         {
             return await _userManager.GetClaimsAsync(user);
+        }
+
+        public async Task<string> LoginAsync(AppUser user, string password)
+        {
+            var result = await _signInManager.PasswordSignInAsync(user.UserName, password, false, false);
+
+            if(!result.Succeeded)
+            {
+                return null;
+            }
+
+            var authClaims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
+
+            var authSigninKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configuration["JWT:Secret"]));
+
+            var token = new JwtSecurityToken(
+                issuer: _configuration["JWT:ValidIssuer"],
+                audience: _configuration["JWT:ValidAudience"],
+                expires: DateTime.Now.AddDays(1),
+                claims: authClaims,
+                signingCredentials: new SigningCredentials(authSigninKey, SecurityAlgorithms.HmacSha256Signature)
+                );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }

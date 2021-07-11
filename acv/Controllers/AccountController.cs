@@ -1,17 +1,15 @@
 ﻿using Application.UseCases.AccountUseCase.Commands.Requests;
-using Application.UseCases.AccountUseCase.Commands.Responses;
 using Domain.Interfaces;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Presentation.Models;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Presentation.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
+    [ApiController, Route("api/[controller]")]
     public class AccountController : ControllerBase
     {
         private readonly IAccountRepository _accountRespository;
@@ -34,10 +32,11 @@ namespace Presentation.Controllers
             return Ok(userList);
         }
 
+        [Authorize]
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetById(string id)
         {
-            var user = await _accountRespository.GetOne(id);
+            var user = await _accountRespository.GetOne(Guid.Parse(id));
 
             var claims = await _accountRespository.GetClaimsAsync(user);
 
@@ -50,17 +49,38 @@ namespace Presentation.Controllers
             });
         }
 
+        [HttpPost("login")]
+        public async Task<IActionResult> SignIn(
+            [FromServices] IMediator mediator,
+            [FromBody] SignInRequest command)
+        {
+            var result = await mediator.Send(command);
+
+            if (!result.Success)
+                return Unauthorized();
+
+            return Ok(new
+            {
+                result.Id,
+                result.Name,
+                result.UserName,
+                result.Email,
+                result.Claims,
+                result.Token
+            });
+        }
+
         [HttpPost("signup")]
-        public Task<SignUpResponse> SignUp(
+        public async Task<IActionResult> SignUp(
             [FromServices] IMediator mediator,
             [FromBody] SignUpRequest command)
         {
-            var result = mediator.Send(command);
+            var result = await mediator.Send(command);
 
-            // if result is not valid then return error message
-            // validar os dados na handler, segundo o balta.io
-
-            return result;
+            if (!result.Success)
+                return Unauthorized();
+            
+            return Ok(result);
         }
     }
 }
