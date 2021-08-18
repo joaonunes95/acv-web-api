@@ -56,32 +56,62 @@ namespace Database.Repositories
             return await _userManager.GetClaimsAsync(user);
         }
 
+        public async Task<IdentityResult> AddToRoleAsync(AppUser user, string role)
+        {
+            return await _userManager.AddToRoleAsync(user, role);
+        }
+
+        public async Task<IdentityResult> AddClaimAsync(AppUser user, Claim claim)
+        {
+            return await _userManager.AddClaimAsync(user, claim);
+        }
+
+        public async Task<IList<string>> GetRolesAsync(AppUser user)
+        {
+            return await _userManager.GetRolesAsync(user);
+        }
+
         public async Task<string> LoginAsync(AppUser user, string password)
         {
             var result = await _signInManager.PasswordSignInAsync(user.UserName, password, false, false);
 
-            if(!result.Succeeded)
+            if (!result.Succeeded)
             {
                 return null;
             }
 
-            var authClaims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            };
+            var roles = await _userManager.GetRolesAsync(user);
+
+            IdentityOptions _options = new IdentityOptions();
 
             var authSigninKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configuration["JWT:Secret"]));
 
-            var token = new JwtSecurityToken(
-                issuer: _configuration["JWT:ValidIssuer"],
-                audience: _configuration["JWT:ValidAudience"],
-                expires: DateTime.Now.AddDays(1),
-                claims: authClaims,
-                signingCredentials: new SigningCredentials(authSigninKey, SecurityAlgorithms.HmacSha256Signature)
-                );
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Name, user.Id.ToString()),
+                    new Claim(ClaimTypes.Role, user.Role)
+                    //new Claim(_options.ClaimsIdentity.RoleClaimType, roles.FirstOrDefault()),
+                    //new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                }),
+                Expires = DateTime.UtcNow.AddDays(1),
+                SigningCredentials = new SigningCredentials(authSigninKey, SecurityAlgorithms.HmacSha256Signature)
+            };
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var securityToken = tokenHandler.CreateToken(tokenDescriptor);
+            var token = tokenHandler.WriteToken(securityToken);
+            return token;
         }
+
+        public async Task<bool> UpdateUser(AppUser user)
+        {
+            var result = await _userManager.UpdateAsync(user);
+
+            return result.Succeeded;
+        }
+
+
     }
 }

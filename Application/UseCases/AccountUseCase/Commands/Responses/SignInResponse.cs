@@ -11,7 +11,7 @@ namespace Application.UseCases.AccountUseCase.Commands.Responses
         public string Name { get; set; }
         public string UserName { get; set; }
         public string Email { get; set; }
-        public IList<Claim> Claims { get; set; }
+        public IList<string> Roles { get; set; }
         public string Token { get; set; }
     }
 }

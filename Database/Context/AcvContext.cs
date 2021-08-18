@@ -14,6 +14,11 @@ namespace Database.Context
         {
         }
 
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+        }
+
         public DbSet<Audio> Audio { get; set; }
 
     }

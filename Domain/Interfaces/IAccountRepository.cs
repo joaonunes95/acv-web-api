@@ -14,6 +14,10 @@ namespace Domain.Interfaces
         Task<AppUser> GetOne(Guid Id);
         Task<AppUser> GetOne(string username);
         Task<IList<Claim>> GetClaimsAsync(AppUser user);
+        Task<IdentityResult> AddToRoleAsync(AppUser user, string role);
+        Task<IdentityResult> AddClaimAsync(AppUser user, Claim claim);
+        Task<IList<string>> GetRolesAsync(AppUser user);
         Task<string> LoginAsync(AppUser user, string password);
+        Task<bool> UpdateUser(AppUser user);
     }
 }

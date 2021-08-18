@@ -3,21 +3,28 @@ using Application.UseCases.AccountUseCase.Commands.Responses;
 using Domain.Entities;
 using Domain.Interfaces;
 using MediatR;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Application.UseCases.AccountUseCase
 {
-    public class AccountCommandHandler : IRequestHandler<SignUpRequest, SignUpResponse>, IRequestHandler<SignInRequest, SignInResponse>
+    public class AccountCommandHandler : 
+        IRequestHandler<SignUpRequest, SignUpResponse>, 
+        IRequestHandler<SignInRequest, SignInResponse>,
+        IRequestHandler<AddPermissionRequest, AddPermissionResponse>
     {
         private readonly IAccountRepository _accountRepository;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public AccountCommandHandler(IAccountRepository accountRepository)
+        public AccountCommandHandler(IAccountRepository accountRepository, RoleManager<IdentityRole> roleManager)
         {
             _accountRepository = accountRepository;
+            _roleManager = roleManager;
         }
 
         public async Task<SignUpResponse> Handle(SignUpRequest request, CancellationToken cancellationToken)
@@ -32,6 +39,9 @@ namespace Application.UseCases.AccountUseCase
 
             var result = await _accountRepository.SignUpAsync(user, request.Password);
 
+            if (!result.Succeeded)
+                return new SignUpResponse { Success = false };
+
             return new SignUpResponse
             {
                 Success = true,
@@ -44,19 +54,14 @@ namespace Application.UseCases.AccountUseCase
 
         public async Task<SignInResponse> Handle(SignInRequest request, CancellationToken cancellationToken)
         {
-            var result = await _accountRepository.LoginAsync(
-                new AppUser { UserName = request.UserName }, 
-                request.Password);
-
-            if (string.IsNullOrEmpty(result))
-                return new SignInResponse
-                {
-                    Success = false
-                };
-
             var user = await _accountRepository.GetOne(request.UserName);
 
-            var claims = await _accountRepository.GetClaimsAsync(user);
+            var result = await _accountRepository.LoginAsync(user, request.Password);
+
+            if (string.IsNullOrEmpty(result) || user == null)
+                return new SignInResponse { Success = false };
+
+            var roles = await _accountRepository.GetRolesAsync(user);
 
             return new SignInResponse
             {
@@ -65,9 +70,29 @@ namespace Application.UseCases.AccountUseCase
                 Name = user.FirstName + " " + user.LastName,
                 UserName = user.UserName,
                 Email = user.Email,
-                Claims = claims,
+                Roles = roles,
                 Token = result
             };
+        }
+
+        public async Task<AddPermissionResponse> Handle(AddPermissionRequest request, CancellationToken cancellationToken)
+        {
+            var user = await _accountRepository.GetOne(request.Id);
+
+            if (user == null)
+                return new AddPermissionResponse { Success = false };
+
+            var result = await _accountRepository.AddToRoleAsync(user, request.Role);
+
+            if (result.Succeeded)
+                return new AddPermissionResponse
+                {
+                    Success = true,
+                    Id = request.Id,
+                    Role = request.Role
+                };
+            else
+                return new AddPermissionResponse { Success = false };
         }
     }
 }
