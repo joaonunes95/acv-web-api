@@ -4,8 +4,11 @@ using System.Threading.Tasks;
 
 namespace Domain.Interfaces
 {
-    public interface IAudioRepository
+    public interface IAudioRepository : IRepository<Audio>
     {
-        Task<List<Audio>> GetAllAudioAsync();
+        Task<Audio> GetByName(string name);
+        Task<Audio> GetByNameLocal(string name);
+        void AddSection(Section section);
+        Task<IEnumerable<Audio>> GetAllCompleteAsync();
     }
 }

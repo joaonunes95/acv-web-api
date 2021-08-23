@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Application.UseCases.ModeloUseCase
 {
-    public class AccountCommandHandler
+    public class ModeloCommandHandler
     {
     }
 }

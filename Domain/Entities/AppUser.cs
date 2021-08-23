@@ -12,6 +12,5 @@ namespace Domain.Entities
         public bool Approved { get; set; }
         public string Registration { get; set; }
         public string BirthDate { get; set; }
-        public string Role { get; set; }
     }
 }

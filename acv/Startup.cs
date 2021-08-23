@@ -1,5 +1,7 @@
+using Application.UseCases.Configurations;
 using Database.Context;
 using Database.Repositories;
+using Database.Repositories.Entities;
 using Domain.Entities;
 using Domain.Interfaces;
 using MediatR;
@@ -12,9 +14,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Linq;
-using System.Security.Claims;
 using System.Text;
 
 namespace acv
@@ -77,8 +76,15 @@ namespace acv
 
             services.AddMediatR(Application.AssemblyReference.Value);
 
-            services.AddTransient<IAudioRepository, AudioRepository>();
-            services.AddTransient<IAccountRepository, AccountRepository>();
+            services.AddAutoMapper(typeof(Mapper).Assembly);
+
+            services.AddScoped(typeof(AcvContext));
+
+            services.AddScoped(typeof(IAccountRepository), typeof(AccountRepository));
+            services.AddScoped(typeof(IAudioRepository), typeof(AudioRepository));
+            services.AddScoped(typeof(ISectionRepository), typeof(SectionRepository));
+            services.AddScoped(typeof(ISpeakerRepository), typeof(SpeakerRepository));
+            services.AddScoped(typeof(IChannelRepository), typeof(ChannelRepository));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

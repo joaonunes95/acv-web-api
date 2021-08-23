@@ -4,14 +4,16 @@ using Database.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Database.Migrations
 {
     [DbContext(typeof(AcvContext))]
-    partial class AudioContextModelSnapshot : ModelSnapshot
+    [Migration("20210821160853_role_to_class")]
+    partial class role_to_class
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -108,11 +110,11 @@ namespace Database.Migrations
                     b.Property<Guid>("ChannelId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
+                    b.Property<float>("Duration")
+                        .HasColumnType("real");
 
-                    b.Property<double>("Duration")
-                        .HasColumnType("float");
+                    b.Property<string>("Filepath")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -130,15 +132,26 @@ namespace Database.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("ChannelCode")
-                        .HasColumnType("int");
-
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Channel");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Class", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Class");
                 });
 
             modelBuilder.Entity("Domain.Entities.Section", b =>
@@ -150,11 +163,11 @@ namespace Database.Migrations
                     b.Property<Guid>("AudioId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("ClassId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<double>("Duration")
                         .HasColumnType("float");
-
-                    b.Property<Guid>("SpeakerId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<double>("Start")
                         .HasColumnType("float");
@@ -166,26 +179,9 @@ namespace Database.Migrations
 
                     b.HasIndex("AudioId");
 
-                    b.HasIndex("SpeakerId");
+                    b.HasIndex("ClassId");
 
                     b.ToTable("Section");
-                });
-
-            modelBuilder.Entity("Domain.Entities.Speaker", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Local")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Speaker");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -336,9 +332,9 @@ namespace Database.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Domain.Entities.Speaker", "Speaker")
+                    b.HasOne("Domain.Entities.Class", "Class")
                         .WithMany("Sections")
-                        .HasForeignKey("SpeakerId")
+                        .HasForeignKey("ClassId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

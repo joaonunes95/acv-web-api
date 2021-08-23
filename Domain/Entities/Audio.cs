@@ -6,7 +6,11 @@ namespace Domain.Entities
 {
     public class Audio : Entity<Audio>
     {
-        public string Descricao { get; set; }
-        public string Falante { get; set; }
+        public string Name { get; set; }
+        public double Duration { get; set; }
+        public DateTime Date { get; set; }
+        public ICollection<Section> Sections { get; set; }
+        public Guid ChannelId { get; set; }
+        public Channel Channel { get; set; }
     }
 }

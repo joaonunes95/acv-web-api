@@ -9,11 +9,10 @@
     <Folder Include="Services\" />
     <Folder Include="UseCases\ModeloUseCase\Commands\Requests\" />
     <Folder Include="UseCases\ModeloUseCase\Commands\Responses\" />
-    <Folder Include="UseCases\AudioUseCase\Commands\Responses\" />
-    <Folder Include="UseCases\AudioUseCase\Commands\Requests\" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.1.1" />
     <PackageReference Include="MediatR" Version="9.0.0" />
   </ItemGroup>
 
