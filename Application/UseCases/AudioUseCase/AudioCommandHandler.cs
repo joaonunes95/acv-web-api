@@ -1,11 +1,12 @@
-﻿using Application.UseCases.AudioUseCase.Commands.Requests;
+﻿using Application.Models;
+using Application.UseCases.AudioUseCase.Commands.Requests;
 using Application.UseCases.AudioUseCase.Commands.Responses;
 using AutoMapper;
 using Domain.Entities;
 using Domain.Interfaces;
 using MediatR;
 using System;
-using System.Collections.Generic;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -37,24 +38,32 @@ namespace Application.UseCases.AudioUseCase
 
         public async Task<PostAudioResponse> Handle(PostAudioRequest request, CancellationToken cancellationToken)
         {
-            if (request is null)
+            if(request is null)
                 throw new ArgumentNullException();
+
+            CultureInfo provider = CultureInfo.InvariantCulture;
 
             foreach (var section in request.Sections)
             {
-                var audioName = section.Date.ToString("yyyyMMdd_HHmmss_") + section.ChannelCode.ToString().PadLeft(3, '0');
+                var crudeDate = section.AudioName.Substring(0, section.AudioName.IndexOf('x'));
+                var date = DateTime.ParseExact(crudeDate, "yyyyMMdd_HHmmss", provider);
 
-                var newSection = _mapper.Map<Section>(section);
+                var channelCode = int.Parse(section.AudioName.Substring(section.AudioName.IndexOf('L')+1));
 
+                var audioName = date.ToString("yyyyMMdd_HHmmss_") + channelCode.ToString().PadLeft(3, '0');
                 var audio = await _audioRepository.GetByNameLocal(audioName);
-                var channel = await GetChannel(section.ChannelCode);
+
+                var channel = await GetChannel(channelCode);
                 var speaker = await GetSpeaker(section.Speaker);
                 
+                var newSection = _mapper.Map<Section>(section);
+
                 if (audio is null)
                 {
                     audio = _mapper.Map<Audio>(section);
                     
                     audio.Channel = channel;
+                    audio.Date = date;
                                         
                     newSection.Speaker = speaker;
                     newSection.Audio = audio;

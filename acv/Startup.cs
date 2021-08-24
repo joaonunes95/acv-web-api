@@ -81,7 +81,7 @@ namespace acv
             services.AddScoped(typeof(AcvContext));
 
             services.AddScoped(typeof(IAccountRepository), typeof(AccountRepository));
-            services.AddScoped(typeof(IAudioRepository), typeof(AudioRepository));
+            services.AddScoped(typeof(IAudioRepository  ), typeof(AudioRepository  ));
             services.AddScoped(typeof(ISectionRepository), typeof(SectionRepository));
             services.AddScoped(typeof(ISpeakerRepository), typeof(SpeakerRepository));
             services.AddScoped(typeof(IChannelRepository), typeof(ChannelRepository));

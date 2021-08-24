@@ -11,6 +11,8 @@ namespace Domain.Interfaces
         void AddMany(ICollection<TEntity> entity);
         Task<IEnumerable<TEntity>> GetAllAsync();
         Task<IEnumerable<TResult>> GetAllAsync<TResult>(Expression<Func<TEntity, TResult>> selector);
+        Task<IEnumerable<TEntity>> GetAllAsync<TResult>(Expression<Func<TEntity, bool>> predicate);
+        Task<IEnumerable<TResult>> GetAllAsync<TResult>(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, TResult>> selector);
         void Update(TEntity entity);
 
 

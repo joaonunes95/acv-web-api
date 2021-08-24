@@ -5,7 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="AutoMapper\" />
     <Folder Include="Services\" />
     <Folder Include="UseCases\ModeloUseCase\Commands\Requests\" />
     <Folder Include="UseCases\ModeloUseCase\Commands\Responses\" />

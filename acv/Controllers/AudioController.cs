@@ -34,6 +34,33 @@ namespace Presentation.Controllers
             }));
         }
 
+        [HttpGet("form")]
+        public async Task<IActionResult> GetFiltered(
+            [FromBody] AudioModelView input)
+        {
+
+            return Ok(await _audioRepository.GetAllAsync(
+                predicate: audio => (
+                    input.AudioId == audio.Id ||
+                    input.ChannelCode == 10
+                ),
+                selector: audio => new
+                {
+                    audio.Id,
+                    audio.Duration,
+                    audio.Date,
+                    Sections = audio.Sections.Select(section => new
+                    {
+                        section.Id,
+                        section.Duration,
+                        section.Speaker,
+                        section.Start,
+                        section.Text
+                    }),
+                    audio.Channel
+                }));
+        }
+
         [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
@@ -62,7 +89,7 @@ namespace Presentation.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(
+        public async Task<IActionResult> PostAnalysis(
             [FromServices] IMediator mediator,
             [FromBody] PostAudioRequest command)
         {
@@ -74,12 +101,12 @@ namespace Presentation.Controllers
             return Ok("Deu bom");
         }
 
-        [HttpPost("analise")]
-        public IActionResult AnalyzeAudio([FromBody] AudioModel input)
-        {
-            // analisar audio pontual vai ser o único post aqui eu acho
-            // na verdade o que o acv poe de entrada são Sections
-            return Ok(input);
-        }
+        //[HttpPost("analise")]
+        //public IActionResult AnalyzeAudio([FromBody] AudioModel input)
+        //{
+        //    // analisar audio pontual vai ser o único post aqui eu acho
+        //    // na verdade o que o acv poe de entrada são Sections
+        //    return Ok(input);
+        //}
     }
 }

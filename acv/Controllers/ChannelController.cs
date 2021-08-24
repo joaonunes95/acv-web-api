@@ -36,11 +36,11 @@ namespace Presentation.Controllers
         }
 
 
-        [HttpPost()]
-        public IActionResult AnalyzeAudio([FromBody] AudioModel input)
-        {
+        //[HttpPost()]
+        //public IActionResult AnalyzeAudio([FromBody] PostChannelRequest command)
+        //{
 
-            return Ok(input);
-        }
+        //    return Ok(input);
+        //}
     }
 }
