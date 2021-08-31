@@ -21,8 +21,6 @@ namespace Presentation.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            //var audio = await _sectionRepository.GetAllAsync();
-
             return Ok(await _sectionRepository.GetAllAsync(x => new
             {
                 Id = x.Id,

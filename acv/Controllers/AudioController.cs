@@ -34,31 +34,24 @@ namespace Presentation.Controllers
             }));
         }
 
-        [HttpGet("form")]
-        public async Task<IActionResult> GetFiltered(
-            [FromBody] AudioModelView input)
+        [HttpGet("search")]
+        public async Task<IActionResult> GetSearch([FromQuery]string speaker, [FromQuery]string date, [FromQuery]string after, [FromQuery]string before, [FromQuery]int channel)
         {
+            try
+            {
+                var result = await _audioRepository.SearchAudio(speaker, date, after, before, channel);
 
-            return Ok(await _audioRepository.GetAllAsync(
-                predicate: audio => (
-                    input.AudioId == audio.Id ||
-                    input.ChannelCode == 10
-                ),
-                selector: audio => new
+                if (result.Any())
                 {
-                    audio.Id,
-                    audio.Duration,
-                    audio.Date,
-                    Sections = audio.Sections.Select(section => new
-                    {
-                        section.Id,
-                        section.Duration,
-                        section.Speaker,
-                        section.Start,
-                        section.Text
-                    }),
-                    audio.Channel
-                }));
+                    return Ok(result);
+                }
+
+                return NotFound();
+            }
+            catch
+            {
+                return BadRequest("Error retrieving data from database");
+            }
         }
 
         [Authorize]
@@ -98,7 +91,7 @@ namespace Presentation.Controllers
             if (!result.Success)
                 return BadRequest(result.Success);
 
-            return Ok("Deu bom");
+            return Ok("Analysis post completed successfully");
         }
 
         //[HttpPost("analise")]
