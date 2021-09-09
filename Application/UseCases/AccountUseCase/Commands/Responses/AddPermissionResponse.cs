@@ -6,6 +6,7 @@ namespace Application.UseCases.AccountUseCase.Commands.Responses
     {
         public bool Success { get; set; }
         public Guid Id { get; set; }
+        public string Name { get; set; }
         public string Role { get; set; }
     }
 }

@@ -12,6 +12,7 @@ namespace Presentation.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = "Admin,User")]
     public class AudioController : ControllerBase
     {
         private readonly IAudioRepository _audioRepository;
@@ -28,6 +29,7 @@ namespace Presentation.Controllers
             {
                 audio.Id,
                 audio.Name,
+                audio.Reliability,
                 audio.Date,
                 audio.Duration,
                 audio.Channel.ChannelCode
@@ -35,11 +37,20 @@ namespace Presentation.Controllers
         }
 
         [HttpGet("search")]
-        public async Task<IActionResult> GetSearch([FromQuery]string speaker, [FromQuery]string date, [FromQuery]string after, [FromQuery]string before, [FromQuery]int channel)
+        public async Task<IActionResult> GetSearch(
+            [FromQuery] int channel,
+            [FromQuery] string speaker, 
+            [FromQuery] string date, 
+            [FromQuery] string after, 
+            [FromQuery] string before,
+            [FromQuery] string name,
+            [FromQuery] double RelySmallerThan,
+            [FromQuery] double RelyGreaterThan
+            )
         {
             try
             {
-                var result = await _audioRepository.SearchAudio(speaker, date, after, before, channel);
+                var result = await _audioRepository.SearchAudio(speaker, date, after, before, channel, name, RelyGreaterThan, RelySmallerThan);
 
                 if (result.Any())
                 {
@@ -54,7 +65,6 @@ namespace Presentation.Controllers
             }
         }
 
-        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
@@ -62,6 +72,7 @@ namespace Presentation.Controllers
             {
                 audio.Id,
                 audio.Name,
+                audio.Reliability,
                 audio.Date,
                 audio.Duration,
                 Sections = audio.Sections.Select(section => new
@@ -82,6 +93,7 @@ namespace Presentation.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> PostAnalysis(
             [FromServices] IMediator mediator,
             [FromBody] PostAudioRequest command)

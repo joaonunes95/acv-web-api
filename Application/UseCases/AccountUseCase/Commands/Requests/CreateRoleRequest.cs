@@ -7,12 +7,9 @@ using System.Text;
 
 namespace Application.UseCases.AccountUseCase.Commands.Requests
 {
-    public class SignInRequest : IRequest<SignInResponse>
+    public class CreateRoleRequest : IRequest<CreateRoleResponse>
     {
-        [Required, EmailAddress]
-        public string Email { get; set; }
-
         [Required]
-        public string Password { get; set; }
+        public string Role { get; set; }
     }
 }

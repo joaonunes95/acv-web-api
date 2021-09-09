@@ -1,4 +1,5 @@
 ﻿using Domain.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentation.Models;
 using System;
@@ -8,6 +9,7 @@ namespace Presentation.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = "Admin")]
     public class ChannelController : ControllerBase
     {
         private readonly IChannelRepository _channelRepository;
@@ -34,7 +36,6 @@ namespace Presentation.Controllers
             var username = "audio: " + id;
             return Ok(username);
         }
-
 
         //[HttpPost()]
         //public IActionResult AnalyzeAudio([FromBody] PostChannelRequest command)

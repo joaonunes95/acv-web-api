@@ -1,6 +1,7 @@
 ﻿using Application.UseCases.SectionUseCase.Commands.Requests;
 using Domain.Interfaces;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ namespace Presentation.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = "Admin")]
     public class SectionController : ControllerBase
     {
         private readonly ISectionRepository _sectionRepository;

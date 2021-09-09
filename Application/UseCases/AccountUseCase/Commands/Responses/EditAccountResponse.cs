@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace Application.UseCases.AccountUseCase.Commands.Responses
 {
-    public class SignUpResponse
+    public class EditAccountResponse
     {
         public bool Success { get; set; }
         public string Name { get; set; }

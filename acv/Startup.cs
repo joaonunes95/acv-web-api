@@ -2,7 +2,7 @@ using Application.UseCases.Configurations;
 using Database.Context;
 using Database.Repositories;
 using Database.Repositories.Entities;
-using Domain.Entities;
+using Domain.Entities.Identity;
 using Domain.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -38,30 +38,8 @@ namespace acv
                 });
             });
 
-            services.AddControllers();
-
-            services.AddAuthentication(option =>
-            {
-                option.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                option.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                //option.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-                .AddJwtBearer(option =>
-                {
-                    option.SaveToken = true;
-                    option.RequireHttpsMetadata = false;
-                    option.TokenValidationParameters = new TokenValidationParameters()
-                    {
-                        ValidateIssuer = false,
-                        ValidateAudience = false,
-                        ValidAudience = Configuration["JWT:ValidAudience"],
-                        ValidIssuer = Configuration["JWT:ValidIssuer"],
-                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["JWT:Secret"]))
-                    };
-                });
-
             services.AddDbContext<AcvContext>(
-                options => options.UseSqlServer(Configuration.GetConnectionString("AcvDB")));
+                options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddIdentity<AppUser, IdentityRole>(option =>
             {
@@ -71,11 +49,33 @@ namespace acv
                 option.Password.RequireNonAlphanumeric = false;
                 option.Password.RequireUppercase = false;
             })
-                .AddEntityFrameworkStores<AcvContext>()
-                .AddDefaultTokenProviders();
+                .AddDefaultTokenProviders()
+                .AddEntityFrameworkStores<AcvContext>();
+
+            services.AddAuthentication(auth =>
+            {
+                auth.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                auth.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+                .AddJwtBearer(option =>
+                {
+                    option.SaveToken = true;
+                    option.RequireHttpsMetadata = false;
+                    option.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        ValidAudience = Configuration["AuthSettings:Audience"],
+                        ValidIssuer = Configuration["AuthSettings:Issuer"],
+                        RequireExpirationTime = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["AuthSettings:Key"])),
+                        ValidateIssuerSigningKey = true
+                    };
+                });
+
+            
 
             services.AddMediatR(Application.AssemblyReference.Value);
-
             services.AddAutoMapper(typeof(Mapper).Assembly);
 
             services.AddScoped(typeof(AcvContext));
@@ -85,6 +85,8 @@ namespace acv
             services.AddScoped(typeof(ISectionRepository), typeof(SectionRepository));
             services.AddScoped(typeof(ISpeakerRepository), typeof(SpeakerRepository));
             services.AddScoped(typeof(IChannelRepository), typeof(ChannelRepository));
+
+            services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

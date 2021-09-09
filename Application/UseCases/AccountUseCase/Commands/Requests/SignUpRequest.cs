@@ -1,5 +1,6 @@
 ﻿using Application.UseCases.AccountUseCase.Commands.Responses;
 using MediatR;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace Application.UseCases.AccountUseCase.Commands.Requests
@@ -14,7 +15,13 @@ namespace Application.UseCases.AccountUseCase.Commands.Requests
 
         [Required, EmailAddress]
         public string Email { get; set; }
-        
+
+        [Required]
+        public string Registration { get; set; }
+
+        [Required]
+        public string BirthDate { get; set; }
+
         [Required, Compare("ConfirmPassword")]
         public string Password { get; set; }
         

@@ -1,4 +1,5 @@
 ﻿using Domain.Entities;
+using Domain.Entities.Identity;
 using Domain.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
@@ -46,9 +47,14 @@ namespace Database.Repositories
             return await _userManager.FindByIdAsync(id.ToString());
         }
 
-        public async Task<AppUser> GetOne(string username)
+        public async Task<AppUser> GetOneByUsername(string username)
         {
             return await _userManager.FindByNameAsync(username);
+        }
+
+        public async Task<AppUser> GetOneByEmail(string email)
+        {
+            return await _userManager.FindByEmailAsync(email);
         }
 
         public async Task<IList<Claim>> GetClaimsAsync(AppUser user)
@@ -71,46 +77,9 @@ namespace Database.Repositories
             return await _userManager.GetRolesAsync(user);
         }
 
-        public async Task<string> LoginAsync(AppUser user, string password)
+        public async Task<IdentityResult> UpdateUser(AppUser user)
         {
-            var result = await _signInManager.PasswordSignInAsync(user.UserName, password, false, false);
-
-            if (!result.Succeeded)
-            {
-                return null;
-            }
-
-            var roles = await _userManager.GetRolesAsync(user);
-
-            IdentityOptions _options = new IdentityOptions();
-
-            var authSigninKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configuration["JWT:Secret"]));
-
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, user.Id.ToString()),
-                    new Claim(_options.ClaimsIdentity.RoleClaimType, roles.FirstOrDefault()),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                }),
-                Expires = DateTime.UtcNow.AddDays(1),
-                SigningCredentials = new SigningCredentials(authSigninKey, SecurityAlgorithms.HmacSha256Signature)
-            };
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var securityToken = tokenHandler.CreateToken(tokenDescriptor);
-            var token = tokenHandler.WriteToken(securityToken);
-            return token;
+            return await _userManager.UpdateAsync(user); ;
         }
-
-        public async Task<bool> UpdateUser(AppUser user)
-        {
-            var result = await _userManager.UpdateAsync(user);
-
-            return result.Succeeded;
-        }
-
-
     }
 }

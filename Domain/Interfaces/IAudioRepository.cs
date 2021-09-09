@@ -6,7 +6,7 @@ namespace Domain.Interfaces
 {
     public interface IAudioRepository : IRepository<Audio>
     {
-        Task<IEnumerable<Audio>> SearchAudio(string speaker, string date, string after, string before, int channel);
+        Task<IEnumerable<Audio>> SearchAudio(string speaker, string date, string after, string before, int channel, string name, double thanRelyGreaterThan, double RelySmallerThan);
         Task<Audio> GetByName(string name);
         Task<Audio> GetByNameLocal(string name);
         void AddSection(Section section);

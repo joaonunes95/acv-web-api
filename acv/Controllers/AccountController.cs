@@ -1,5 +1,5 @@
 ﻿using Application.UseCases.AccountUseCase.Commands.Requests;
-using Domain.Entities;
+using Domain.Entities.Identity;
 using Domain.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -7,34 +7,37 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Presentation.Controllers
 {
     [ApiController, Route("api/[controller]")]
+    [Authorize(Roles = "Admin,User")]
     public class AccountController : ControllerBase
     {
-        private readonly IAccountRepository _accountRespository;
+        private readonly IAccountRepository _accountRepository;
         private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
 
         public AccountController(
-            IAccountRepository accountRespository,
+            IAccountRepository accountRepository,
             UserManager<AppUser> userManager,
             RoleManager<IdentityRole> roleManager)
         {
-            _accountRespository = accountRespository;
+            _accountRepository = accountRepository;
             _userManager = userManager;
             _roleManager = roleManager;
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult GetAll()
         {
-            var userList = _accountRespository.GetAll().Select(user => new
+            var userList = _accountRepository.GetAll().Select(user => new
             {
                 Id = Guid.Parse(user.Id),
-                Name = user.FirstName + " " + user.LastName,
+                Name = user.FirstName,
                 user.UserName,
                 user.Approved
             });
@@ -42,25 +45,28 @@ namespace Presentation.Controllers
             return Ok(userList);
         }
 
-        [Authorize]
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var user = await _accountRespository.GetOne(id);
+            var user = await _accountRepository.GetOne(id);
 
-            var roles = await _accountRespository.GetRolesAsync(user);
+            var roles = await _accountRepository.GetRolesAsync(user);
 
             return Ok(new
             {
                 user.Id,
                 Name = user.FirstName + " " + user.LastName,
                 user.UserName,
+                user.BirthDate,
+                user.Email,
+                user.Registration,
                 user.Approved,
                 roles                
             });
         }
 
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<IActionResult> SignIn(
             [FromServices] IMediator mediator,
             [FromBody] SignInRequest command)
@@ -68,7 +74,7 @@ namespace Presentation.Controllers
             var result = await mediator.Send(command);
 
             if (!result.Success)
-                return Unauthorized();
+                return BadRequest(result);
 
             return Ok(new
             {
@@ -76,12 +82,13 @@ namespace Presentation.Controllers
                 result.Name,
                 result.UserName,
                 result.Email,
-                result.Roles,
+                result.ExpireDate,
                 result.Token
             });
         }
 
         [HttpPost("signup")]
+        [AllowAnonymous]
         public async Task<IActionResult> SignUp(
             [FromServices] IMediator mediator,
             [FromBody] SignUpRequest command)
@@ -94,14 +101,49 @@ namespace Presentation.Controllers
             return Ok(result);
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(Guid id)
+        [HttpPut("EditAccount")]
+        public async Task<IActionResult> Edit(
+            [FromServices] IMediator mediator,
+            [FromBody] EditAccountRequest command)
         {
+            command.CurrentUserId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            command.isAdmin = User.IsInRole("Admin");
 
-            return Ok("Nao implementado. Id = " + id);
+            var result = await mediator.Send(command);
+
+            if (!result.Success)
+                return Unauthorized();
+
+            return Ok(result);
+        }
+
+        [HttpGet("roles")]
+        [Authorize(Roles = "Admin")]
+        public IActionResult GetRoles()
+        {
+            return Ok(_roleManager.Roles.Select(x => new
+            {
+                x.Id,
+                x.Name
+            }));
+        }
+
+        [HttpPost("roles")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> CreateRole(
+            [FromServices] IMediator mediator,
+            [FromBody] CreateRoleRequest command)
+        {
+            var result = await mediator.Send(command);
+
+            if (!result.Success)
+                return BadRequest(result);
+
+            return Ok(result);
         }
 
         [HttpPost("permission")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddPermission(
             [FromServices] IMediator mediator,
             [FromBody] AddPermissionRequest command)
@@ -115,11 +157,12 @@ namespace Presentation.Controllers
         }
 
         [HttpGet("permission/{id:guid}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllPermission(Guid id)
         {
-            var user = await _accountRespository.GetOne(id);
+            var user = await _accountRepository.GetOne(id);
 
-            var roles = await _accountRespository.GetRolesAsync(user);
+            var roles = await _accountRepository.GetRolesAsync(user);
 
             return Ok(new
             {
@@ -129,9 +172,10 @@ namespace Presentation.Controllers
         }
 
         [HttpGet("unconfirmed")]
+        [Authorize(Roles = "Admin")]
         public IActionResult GetUnconfirmed()
         {
-            var userList = _accountRespository.GetAll().Select(user => new
+            var userList = _accountRepository.GetAll().Select(user => new
             {
                 Id = Guid.Parse(user.Id),
                 Name = user.FirstName + " " + user.LastName,
@@ -141,22 +185,13 @@ namespace Presentation.Controllers
 
             return Ok(userList);
         }
-
-        //[Authorize(Policy = "AdminAccess")]
-        [HttpPut("confirm/{id:guid}")]
-        //[Authorize(Roles = "Admin,Manager,User")]
-        public async Task<IActionResult> Confirm(Guid id)
+        
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
+        public IActionResult Delete(Guid id)
         {
-            var user = await _accountRespository.GetOne(id);
 
-            if (user.Approved)
-                return Ok("Já tinha dado bom. Id: " + user.FirstName);
-
-            user.Approved = true;
-
-            await _accountRespository.UpdateUser(user);
-
-            return Ok("Deu bom só agora. Id: " + user.FirstName);
+            return Ok("Nao implementado. Id = " + id);
         }
     }
 }

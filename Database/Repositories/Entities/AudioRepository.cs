@@ -42,49 +42,57 @@ namespace Database.Repositories.Entities
             Context.Set<Section>().Add(section);
         }
 
-        public async Task<IEnumerable<Audio>> SearchAudio(string speaker, string date, string after, string before, int channel)
+        public async Task<IEnumerable<Audio>> SearchAudio(
+            string speaker, 
+            string dateStr, 
+            string after, 
+            string before, 
+            int channel, 
+            string name,
+            double RelyGreaterThan,
+            double RelySmallerThan)
         {
-            CultureInfo provider = CultureInfo.InvariantCulture;
             IQueryable<Audio> query = Context.Audio;
+
+            // date
+            CultureInfo provider = CultureInfo.InvariantCulture;
 
             var date1 = new DateTime();
             var date2 = new DateTime();
 
-            // date
-            if (!string.IsNullOrEmpty(after))
+            if (!string.IsNullOrEmpty(dateStr))
             {
-                if (!string.IsNullOrEmpty(before))
-                {
-                    date1 = DateTime.ParseExact(after, "yyyyMMdd", provider);
-                    date2 = DateTime.ParseExact(before, "yyyyMMdd", provider);
-
-                    query = query.Where(a => a.Date >= date1 && a.Date <= date2);
-                }
-                else
-                {
-                    date1 = DateTime.ParseExact(after, "yyyyMMdd", provider);
-
-                    query = query.Where(a => a.Date >= date1);
-                }
+                date1 = DateTime.ParseExact(dateStr, "ddMMyyyy", provider);
+                query = query.Where(a => a.Date.Date == date1);
             }
             else
-            {
-                if (!string.IsNullOrEmpty(before))
+                if (!string.IsNullOrEmpty(after) && !string.IsNullOrEmpty(before))
                 {
-                    date2 = DateTime.ParseExact(before, "yyyyMMdd", provider);
-
-                    query = query.Where(a => a.Date <= date2);
+                    date1 = DateTime.ParseExact(after, "ddMMyyyy", provider);
+                    date2 = DateTime.ParseExact(before, "ddMMyyyy", provider);
+                    query = query.Where(a => a.Date >= date1 && a.Date <= date2);
                 }
-                else
-                {
-                    if (!string.IsNullOrEmpty(date))
+                else if (!string.IsNullOrEmpty(after))
                     {
-                        date1 = DateTime.ParseExact(date, "yyyyMMdd", provider);
-
-                        query = query.Where(a => a.Date.Date == date1);
+                        date1 = DateTime.ParseExact(after, "ddMMyyyy", provider);
+                        query = query.Where(a => a.Date >= date1);
                     }
-                }
-            }
+                    else if (!string.IsNullOrEmpty(before))
+                    {
+                        date1 = DateTime.ParseExact(before, "ddMMyyyy", provider);
+                        query = query.Where(a => a.Date <= date1);
+                    }
+
+            // Relyability
+            if (RelyGreaterThan != 0)
+                query = query.Where(a => a.Reliability >= RelyGreaterThan);
+
+            if (RelySmallerThan != 0)
+                query = query.Where(a => a.Reliability <= RelySmallerThan);
+
+            // name
+            if (!string.IsNullOrEmpty(name))
+                query = query.Where(a => a.Name == name);
 
             // speaker
             if (!string.IsNullOrEmpty(speaker))
