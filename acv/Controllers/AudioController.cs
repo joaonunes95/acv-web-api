@@ -116,6 +116,7 @@ namespace Presentation.Controllers
             {
                 audio.Id,
                 audio.Name,
+                audio.FilePath,
                 audio.Reliability,
                 audio.Date,
                 audio.Duration,
@@ -131,8 +132,7 @@ namespace Presentation.Controllers
                     audio.Channel.Id,
                     audio.Channel.ChannelCode,
                     audio.Channel.Name
-                },
-                AudioPlayer = "...Filepath..."
+                }
             }));
         }
 

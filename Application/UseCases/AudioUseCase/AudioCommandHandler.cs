@@ -73,7 +73,7 @@ namespace Application.UseCases.AudioUseCase
                 else
                 {
                     if (await _sectionRepository.AnyAsync(x => x.AudioId == audio.Id && x.Start == section.Start))
-                        return new PostAudioResponse { Success = false }; // pensar numa resposta desaforada - section repetida
+                        return new PostAudioResponse { Success = false }; // section repetida
 
                     newSection.Speaker = speaker;
                     newSection.Audio = audio;

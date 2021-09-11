@@ -12,6 +12,7 @@ namespace Application.UseCases.AudioUseCase.Commands.Requests
         public class SectionInput
         {
             public string AudioName { get; set; }
+            public string FilePath { get; set; }
             public double Duration { get; set; }
             public double AudioDuration { get; set; }
             public double AudioReliability { get; set; }
