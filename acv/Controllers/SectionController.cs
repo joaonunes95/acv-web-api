@@ -20,6 +20,10 @@ namespace Presentation.Controllers
             _sectionRepository = sectionRepository;
         }
 
+        /// <summary>
+        /// Gets all sections
+        /// </summary>
+        /// <returns>A list of sections</returns>
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -34,29 +38,16 @@ namespace Presentation.Controllers
             }));
         }
 
-        [HttpGet("{id}")]
-        public IActionResult GetById(Guid id)
-        {
-            if (id == Guid.Empty)
-                return NotFound();
-
-            var username = "audio: " + id;
-            return Ok(username);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Post(
-            [FromServices] IMediator mediator,
-            [FromBody] PostSectionRequest command)
+        /// <summary>
+        /// Gets one section by its Id
+        /// </summary>
+        /// <param name="id">Section's Id</param>
+        /// <returns>One section</returns>
+        [HttpGet("{id:guid}")]
+        public async Task<IActionResult> GetById(Guid id)
         {
 
-            var result = await mediator.Send(command);
-
-            if (!result.Success)
-                return BadRequest(result.Success);
-
-
-            return Ok("Deu bom");
+            return Ok(await _sectionRepository.GetByIdAsync(id));
         }
     }
 }

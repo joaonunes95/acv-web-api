@@ -1,0 +1,155 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Presentation</name>
+    </assembly>
+    <members>
+        <member name="M:Presentation.Controllers.AccountController.GetAll">
+            <summary>
+            Gets basic information of all users
+            </summary>
+            <returns>A list of users</returns>
+        </member>
+        <member name="M:Presentation.Controllers.AccountController.GetById(System.Guid)">
+            <summary>
+            Gets more information of one specific user
+            </summary>
+            <param name="id">User's Id</param>
+            <returns>One user</returns>
+        </member>
+        <member name="M:Presentation.Controllers.AccountController.SignIn(MediatR.IMediator,Application.UseCases.AccountUseCase.Commands.Requests.SignInRequest)">
+            <summary>
+            Log in to API
+            </summary>
+            <param name="mediator">Not a frontend's concern</param>
+            <param name="command">User's email and password</param>
+            <returns>Some user's data and token</returns>
+        </member>
+        <member name="M:Presentation.Controllers.AccountController.SignUp(MediatR.IMediator,Application.UseCases.AccountUseCase.Commands.Requests.SignUpRequest)">
+            <summary>
+            Sign up to API
+            </summary>
+            <param name="mediator">Not a frontend's concern</param>
+            <param name="command">User's Firstname, LastName, Email, Registration, BirthDate, Password and ConfirmPassword</param>
+            <returns>Some user data and a list of errors</returns>
+        </member>
+        <member name="M:Presentation.Controllers.AccountController.Edit(MediatR.IMediator,Application.UseCases.AccountUseCase.Commands.Requests.EditAccountRequest)">
+            <summary>
+            Edits user's informations. Only an Admin can edit user's birthdate and registration.
+            </summary>
+            <param name="mediator"></param>
+            <param name="command">Any user data</param>
+            <returns></returns>
+        </member>
+        <member name="M:Presentation.Controllers.AccountController.GetRoles">
+            <summary>
+            Gets all the roles available
+            </summary>
+            <returns>A list of roles</returns>
+        </member>
+        <member name="M:Presentation.Controllers.AccountController.CreateRole(MediatR.IMediator,Application.UseCases.AccountUseCase.Commands.Requests.CreateRoleRequest)">
+            <summary>
+            Posts a new role
+            </summary>
+            <param name="mediator"></param>
+            <param name="command"></param>
+            <returns>The role name</returns>
+        </member>
+        <member name="M:Presentation.Controllers.AccountController.AddPermission(MediatR.IMediator,Application.UseCases.AccountUseCase.Commands.Requests.AddPermissionRequest)">
+            <summary>
+            Associates a user to a role
+            </summary>
+            <param name="mediator"></param>
+            <param name="command">User Id and role name</param>
+            <returns></returns>
+        </member>
+        <member name="M:Presentation.Controllers.AccountController.GetAllPermission(System.Guid)">
+            <summary>
+            Gets a user's roles by his Id
+            </summary>
+            <param name="id">User's Id</param>
+            <returns>User name and his roles</returns>
+        </member>
+        <member name="M:Presentation.Controllers.AccountController.GetUnconfirmed">
+            <summary>
+            Gets all users who weren't approved by an Admin
+            </summary>
+            <returns>A list of users</returns>
+        </member>
+        <member name="M:Presentation.Controllers.AccountController.Delete(System.Guid)">
+            <summary>
+            Not implemented
+            </summary>
+            <param name="id">User's Id</param>
+            <returns></returns>
+        </member>
+        <member name="M:Presentation.Controllers.AudioController.Get">
+            <summary>
+            Gets basic information of all audio
+            </summary>
+            <returns>A list of audio</returns>
+            <remarks>
+            
+            Sample request: GET /api/Audio
+            
+            </remarks>
+        </member>
+        <member name="M:Presentation.Controllers.AudioController.GetSearch(System.Int32,System.String,System.String,System.String,System.String,System.String,System.Double,System.Double)">
+            <summary>
+            Gets basic information of searched audio
+            </summary>
+            <param name="channel">Channel code of the audio's channel</param>
+            <param name="speaker">Name of any speaker of any audio's section</param>
+            <param name="date">Exact date of an audio's record</param>
+            <param name="after">Bottom limit of date of audio's record</param>
+            <param name="before">Top limit of date of audio's record</param>
+            <param name="name">Audio's name</param>
+            <param name="RelySmallerThan">Top limit of date of audio's record</param>
+            <param name="RelyGreaterThan">Bottom limit of date of audio's record</param>
+            <returns>
+            A list of audio
+            </returns>
+        </member>
+        <member name="M:Presentation.Controllers.AudioController.GetById(System.Guid)">
+            <summary>
+            Gets filepath, basic information, channel and sections of an audio
+            </summary>
+            <param name="id">Audio's Id</param>
+            <returns>A full audio object</returns>
+        </member>
+        <member name="M:Presentation.Controllers.AudioController.PostAnalysis(MediatR.IMediator,Application.UseCases.AudioUseCase.Commands.Requests.PostAudioRequest)">
+            <summary>
+            Posts one or many audio
+            </summary>
+            <param name="mediator">Not a frontend's concern</param>
+            <param name="command">List of sections of one or many audio</param>
+            <returns>Success ou Error message</returns>
+        </member>
+        <member name="M:Presentation.Controllers.ChannelController.Get">
+            <summary>
+            Gets all channels
+            </summary>
+            <returns>A list of channels</returns>
+        </member>
+        <member name="M:Presentation.Controllers.ChannelController.GetById(System.Guid)">
+            <summary>
+            Gets a channel by its Id
+            </summary>
+            <param name="id">Channel's Id</param>
+            <returns>One channel</returns>
+        </member>
+        <member name="M:Presentation.Controllers.SectionController.Get">
+            <summary>
+            Gets all sections
+            </summary>
+            <returns>A list of sections</returns>
+        </member>
+        <member name="M:Presentation.Controllers.SectionController.GetById(System.Guid)">
+            <summary>
+            Gets one section by its Id
+            </summary>
+            <param name="id">Section's Id</param>
+            <returns>One section</returns>
+        </member>
+    </members>
+</doc>

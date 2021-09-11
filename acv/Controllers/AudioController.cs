@@ -22,6 +22,15 @@ namespace Presentation.Controllers
             _audioRepository = audioRepository;
         }
 
+        /// <summary>
+        /// Gets basic information of all audio
+        /// </summary>
+        /// <returns>A list of audio</returns>
+        /// <remarks>
+        /// 
+        /// Sample request: GET /api/Audio
+        /// 
+        /// </remarks>
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -32,10 +41,28 @@ namespace Presentation.Controllers
                 audio.Reliability,
                 audio.Date,
                 audio.Duration,
-                audio.Channel.ChannelCode
+                Channel = new
+                {
+                    audio.Channel.Name,
+                    audio.Channel.ChannelCode
+                }
             }));
         }
 
+        /// <summary>
+        /// Gets basic information of searched audio
+        /// </summary>
+        /// <param name="channel">Channel code of the audio's channel</param>
+        /// <param name="speaker">Name of any speaker of any audio's section</param>
+        /// <param name="date">Exact date of an audio's record</param>
+        /// <param name="after">Bottom limit of date of audio's record</param>
+        /// <param name="before">Top limit of date of audio's record</param>
+        /// <param name="name">Audio's name</param>
+        /// <param name="RelySmallerThan">Top limit of date of audio's record</param>
+        /// <param name="RelyGreaterThan">Bottom limit of date of audio's record</param>
+        /// <returns>
+        /// A list of audio
+        /// </returns>
         [HttpGet("search")]
         public async Task<IActionResult> GetSearch(
             [FromQuery] int channel,
@@ -54,7 +81,19 @@ namespace Presentation.Controllers
 
                 if (result.Any())
                 {
-                    return Ok(result);
+                    return Ok(result.Select(audio => new
+                    {
+                        audio.Id,
+                        audio.Name,
+                        audio.Reliability,
+                        audio.Date,
+                        audio.Duration,
+                        Channel = new
+                        {
+                            audio.Channel.Name,
+                            audio.Channel.ChannelCode
+                        }
+                    }));
                 }
 
                 return NotFound();
@@ -65,6 +104,11 @@ namespace Presentation.Controllers
             }
         }
 
+        /// <summary>
+        /// Gets filepath, basic information, channel and sections of an audio
+        /// </summary>
+        /// <param name="id">Audio's Id</param>
+        /// <returns>A full audio object</returns>
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(Guid id)
         {
@@ -88,10 +132,16 @@ namespace Presentation.Controllers
                     audio.Channel.ChannelCode,
                     audio.Channel.Name
                 },
-                AudioPlayer = "Retorno para tocar áudio..."
+                AudioPlayer = "...Filepath..."
             }));
         }
 
+        /// <summary>
+        /// Posts one or many audio
+        /// </summary>
+        /// <param name="mediator">Not a frontend's concern</param>
+        /// <param name="command">List of sections of one or many audio</param>
+        /// <returns>Success ou Error message</returns>
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> PostAnalysis(

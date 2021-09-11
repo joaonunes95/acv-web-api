@@ -19,6 +19,10 @@ namespace Presentation.Controllers
             _channelRepository = channelRepository;
         }
 
+        /// <summary>
+        /// Gets all channels
+        /// </summary>
+        /// <returns>A list of channels</returns>
         [HttpGet]
         public async Task<IActionResult> Get()
         {
@@ -27,14 +31,16 @@ namespace Presentation.Controllers
             return Ok(audio);
         }
 
+        /// <summary>
+        /// Gets a channel by its Id
+        /// </summary>
+        /// <param name="id">Channel's Id</param>
+        /// <returns>One channel</returns>
         [HttpGet("{id}")]
-        public IActionResult GetById(Guid id)
+        public async Task<IActionResult> GetById(Guid id)
         {
-            if (id == Guid.Empty)
-                return NotFound();
 
-            var username = "audio: " + id;
-            return Ok(username);
+            return Ok(await _channelRepository.GetByIdAsync(id));
         }
 
         //[HttpPost()]

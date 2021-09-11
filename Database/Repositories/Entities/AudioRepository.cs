@@ -102,7 +102,7 @@ namespace Database.Repositories.Entities
             if (channel != 0)
                 query = query.Where(a => a.Channel.ChannelCode == channel);
 
-            return await query.ToListAsync();
+            return await query.Include(x => x.Channel).ToListAsync();
         }
     }
 }

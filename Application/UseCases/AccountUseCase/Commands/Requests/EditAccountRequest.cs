@@ -9,7 +9,6 @@ namespace Application.UseCases.AccountUseCase.Commands.Requests
 {
     public class EditAccountRequest : IRequest<EditAccountResponse>
     {
-        [Required]
         public Guid CurrentUserId { get; set; }
 
         [Required]

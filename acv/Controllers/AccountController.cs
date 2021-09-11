@@ -30,6 +30,10 @@ namespace Presentation.Controllers
             _roleManager = roleManager;
         }
 
+        /// <summary>
+        /// Gets basic information of all users
+        /// </summary>
+        /// <returns>A list of users</returns>
         [HttpGet]
         [Authorize(Roles = "Admin")]
         public IActionResult GetAll()
@@ -45,6 +49,11 @@ namespace Presentation.Controllers
             return Ok(userList);
         }
 
+        /// <summary>
+        /// Gets more information of one specific user
+        /// </summary>
+        /// <param name="id">User's Id</param>
+        /// <returns>One user</returns>
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetById(Guid id)
         {
@@ -65,6 +74,12 @@ namespace Presentation.Controllers
             });
         }
 
+        /// <summary>
+        /// Log in to API
+        /// </summary>
+        /// <param name="mediator">Not a frontend's concern</param>
+        /// <param name="command">User's email and password</param>
+        /// <returns>Some user's data and token</returns>
         [HttpPost("login")]
         [AllowAnonymous]
         public async Task<IActionResult> SignIn(
@@ -87,6 +102,12 @@ namespace Presentation.Controllers
             });
         }
 
+        /// <summary>
+        /// Sign up to API
+        /// </summary>
+        /// <param name="mediator">Not a frontend's concern</param>
+        /// <param name="command">User's Firstname, LastName, Email, Registration, BirthDate, Password and ConfirmPassword</param>
+        /// <returns>Some user data and a list of errors</returns>
         [HttpPost("signup")]
         [AllowAnonymous]
         public async Task<IActionResult> SignUp(
@@ -101,6 +122,12 @@ namespace Presentation.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Edits user's informations. Only an Admin can edit user's birthdate and registration.
+        /// </summary>
+        /// <param name="mediator"></param>
+        /// <param name="command">Any user data</param>
+        /// <returns></returns>
         [HttpPut("EditAccount")]
         public async Task<IActionResult> Edit(
             [FromServices] IMediator mediator,
@@ -117,6 +144,10 @@ namespace Presentation.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Gets all the roles available
+        /// </summary>
+        /// <returns>A list of roles</returns>
         [HttpGet("roles")]
         [Authorize(Roles = "Admin")]
         public IActionResult GetRoles()
@@ -128,6 +159,12 @@ namespace Presentation.Controllers
             }));
         }
 
+        /// <summary>
+        /// Posts a new role
+        /// </summary>
+        /// <param name="mediator"></param>
+        /// <param name="command"></param>
+        /// <returns>The role name</returns>
         [HttpPost("roles")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateRole(
@@ -142,6 +179,12 @@ namespace Presentation.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Associates a user to a role
+        /// </summary>
+        /// <param name="mediator"></param>
+        /// <param name="command">User Id and role name</param>
+        /// <returns></returns>
         [HttpPost("permission")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddPermission(
@@ -156,6 +199,11 @@ namespace Presentation.Controllers
             return Ok(result);
         }
 
+        /// <summary>
+        /// Gets a user's roles by his Id
+        /// </summary>
+        /// <param name="id">User's Id</param>
+        /// <returns>User name and his roles</returns>
         [HttpGet("permission/{id:guid}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllPermission(Guid id)
@@ -171,6 +219,10 @@ namespace Presentation.Controllers
             });
         }
 
+        /// <summary>
+        /// Gets all users who weren't approved by an Admin
+        /// </summary>
+        /// <returns>A list of users</returns>
         [HttpGet("unconfirmed")]
         [Authorize(Roles = "Admin")]
         public IActionResult GetUnconfirmed()
@@ -186,11 +238,15 @@ namespace Presentation.Controllers
             return Ok(userList);
         }
         
+        /// <summary>
+        /// Not implemented
+        /// </summary>
+        /// <param name="id">User's Id</param>
+        /// <returns></returns>
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public IActionResult Delete(Guid id)
         {
-
             return Ok("Nao implementado. Id = " + id);
         }
     }
