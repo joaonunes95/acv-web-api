@@ -55,27 +55,12 @@ namespace Database.Repositories
             return await CurrentSet.Select(selector).ToListAsync();
         }
 
-        //public async Task<IEnumerable<TEntity>> GetAllAsync<TResult>(Expression<Func<TEntity, bool>> predicate)
-        //{
-        //    if (predicate is null)
-        //    {
-        //        return await GetAllAsync();
-        //    }
-
-        //    return await CurrentSet.Where(predicate).ToArrayAsync();
-        //}
-
         public async Task<IEnumerable<TEntity>> GetAllAsync<TResult>(Expression<Func<TEntity, bool>> predicate)
         {
             if (predicate is null)
             {
                 return await GetAllAsync();
             }
-
-            //if (selector is null)
-            //{
-            //    throw new ArgumentNullException(nameof(selector));
-            //}
 
             return await CurrentSet.Where(predicate).ToListAsync();
         }

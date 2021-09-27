@@ -185,7 +185,7 @@ namespace Presentation.Controllers
         /// <param name="mediator"></param>
         /// <param name="command">User Id and role name</param>
         /// <returns></returns>
-        [HttpPost("permission")]
+        [HttpPost("Permission")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AddPermission(
             [FromServices] IMediator mediator,
@@ -195,7 +195,7 @@ namespace Presentation.Controllers
 
             if (!result.Success)
                 return BadRequest(result);
-            
+
             return Ok(result);
         }
 

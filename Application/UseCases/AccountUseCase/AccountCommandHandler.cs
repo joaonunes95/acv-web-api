@@ -142,6 +142,7 @@ namespace Application.UseCases.AccountUseCase
                 return new AddPermissionResponse
                 {
                     Success = true,
+                    Id = user.Id,
                     Name = user.FirstName,
                     Role = request.Role
                 };
